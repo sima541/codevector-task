@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Product Browser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --border2: #333333;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #555;
+    --accent: #7c6df0;
+    --accent2: #5a4dd4;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(15,15,15,0.95);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.3px;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .header-meta span {
+    color: var(--green);
+  }
+
+  /* Layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* Sidebar */
+  aside {
+    border-right: 1px solid var(--border);
+    padding: 20px 16px;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text3);
+    margin-bottom: 10px;
+    padding: 0 8px;
+  }
+
+  .cat-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-family: var(--sans);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+  }
+
+  .cat-btn:hover { background: var(--surface); color: var(--text); }
+
+  .cat-btn.active {
+    background: rgba(124,109,240,0.15);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .cat-count {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .cat-btn.active .cat-count { color: var(--accent); opacity: 0.7; }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  /* Main */
+  main { padding: 24px; }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .page-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: var(--surface2);
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+
+  .limit-select {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .limit-select:focus { border-color: var(--accent); }
+
+  /* Product grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: border-color 0.15s, transform 0.15s;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:hover {
+    border-color: var(--border2);
+    transform: translateY(-1px);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+
+  .card-name {
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  .price {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green);
+    white-space: nowrap;
+  }
+
+  .cat-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .card-id {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+  }
+
+  .card-date {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+  }
+
+  /* Category colors */
+  .cat-Electronics { background: rgba(99,102,241,0.15); color: #818cf8; }
+  .cat-Clothing    { background: rgba(236,72,153,0.15); color: #f472b6; }
+  .cat-Books       { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .cat-Home        { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+  .cat-Sports      { background: rgba(34,197,94,0.15);  color: #4ade80; }
+  .cat-Toys        { background: rgba(239,68,68,0.15);  color: #f87171; }
+  .cat-Food        { background: rgba(249,115,22,0.15); color: #fb923c; }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 7px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: var(--surface2);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+  }
+
+  .page-info {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    padding: 0 8px;
+  }
+
+  /* Loading */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 0;
+    gap: 10px;
+    color: var(--text3);
+    font-size: 13px;
+  }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Empty */
+  .empty {
+    text-align: center;
+    padding: 80px 0;
+    color: var(--text3);
+  }
+
+  .empty-title { font-size: 15px; margin-bottom: 6px; color: var(--text2); }
+
+  /* Cursor debug bar */
+  .debug-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .debug-label { color: var(--accent); font-weight: 500; }
+
+  .debug-cursor {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text2);
+  }
+
+  @media (max-width: 640px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { display: none; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Product Browser
+  </div>
+  <div class="header-meta">200,000 products &nbsp;·&nbsp; <span>live</span></div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-label">Categories</div>
+    <button class="cat-btn active" data-cat="" onclick="selectCategory('')">
+      All products
+      <span class="cat-count">200k</span>
+    </button>
+    <div class="divider"></div>
+    <button class="cat-btn" data-cat="Electronics" onclick="selectCategory('Electronics')">Electronics<span class="cat-count"></span></button>
+    <button class="cat-btn" data-cat="Clothing" onclick="selectCategory('Clothing')">Clothing<span class="cat-count"></span></button>
+    <button class="cat-btn" data-cat="Books" onclick="selectCategory('Books')">Books<span class="cat-count"></span></button>
+    <button class="cat-btn" data-cat="Home" onclick="selectCategory('Home')">Home<span class="cat-count"></span></button>
+    <button class="cat-btn" data-cat="Sports" onclick="selectCategory('Sports')">Sports<span class="cat-count"></span></button>
+    <button class="cat-btn" data-cat="Toys" onclick="selectCategory('Toys')">Toys<span class="cat-count"></span></button>
+    <button class="cat-btn" data-cat="Food" onclick="selectCategory('Food')">Food<span class="cat-count"></span></button>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <span class="page-title" id="page-title">All products</span>
+        <span class="badge" id="page-badge">page 1</span>
+      </div>
+      <select class="limit-select" id="limit-select" onchange="changeLimit(this.value)">
+        <option value="20">20 per page</option>
+        <option value="40">40 per page</option>
+        <option value="100">100 per page</option>
+      </select>
+    </div>
+
+    <div class="debug-bar" id="debug-bar" style="display:none">
+      <span class="debug-label">cursor</span>
+      <span class="debug-cursor" id="debug-cursor">—</span>
+    </div>
+
+    <div id="content"></div>
+
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<script>
+const API = 'https://codevector-task-jtfe.onrender.com'
+
+let state = {
+  category: '',
+  limit: 20,
+  page: 1,
+  cursorStack: [],   // stack of cursors — cursorStack[i] = cursor to fetch page i+1
+  currentCursor: null,
+  nextCursor: null,
+  loading: false
+}
+
+async function fetchProducts() {
+  if (state.loading) return
+  state.loading = true
+  renderLoading()
+
+  const params = new URLSearchParams()
+  params.set('limit', state.limit)
+  if (state.category) params.set('category', state.category)
+  if (state.currentCursor) params.set('cursor', state.currentCursor)
+
+  try {
+    const res = await fetch(`${API}/products?${params}`)
+    const data = await res.json()
+    state.nextCursor = data.next_cursor
+    renderProducts(data.data)
+    renderPagination()
+    renderDebug()
+  } catch (e) {
+    document.getElementById('content').innerHTML = `
+      <div class="empty">
+        <div class="empty-title">Could not reach the API</div>
+        <div>${e.message}</div>
+      </div>`
+  } finally {
+    state.loading = false
+  }
+}
+
+function renderLoading() {
+  document.getElementById('content').innerHTML = `
+    <div class="loading"><div class="spinner"></div> Loading products…</div>`
+  document.getElementById('pagination').innerHTML = ''
+}
+
+function renderProducts(products) {
+  if (!products.length) {
+    document.getElementById('content').innerHTML = `
+      <div class="empty">
+        <div class="empty-title">No products found</div>
+        <div>Try a different category</div>
+      </div>`
+    return
+  }
+
+  const cards = products.map(p => {
+    const date = new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    const shortId = p.id.split('-')[0]
+    const priceFormatted = parseFloat(p.price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+    return `
+      <div class="card">
+        <div class="card-top">
+          <div class="card-name">${p.name}</div>
+          <div class="price">${priceFormatted}</div>
+        </div>
+        <span class="cat-tag cat-${p.category}">${p.category}</span>
+        <div class="card-footer">
+          <span class="card-id">${shortId}…</span>
+          <span class="card-date">${date}</span>
+        </div>
+      </div>`
+  }).join('')
+
+  document.getElementById('content').innerHTML = `<div class="grid">${cards}</div>`
+  document.getElementById('page-badge').textContent = `page ${state.page}`
+}
+
+function renderPagination() {
+  const hasPrev = state.page > 1
+  const hasNext = !!state.nextCursor
+
+  document.getElementById('pagination').innerHTML = `
+    <button class="btn" onclick="prevPage()" ${hasPrev ? '' : 'disabled'}>← Prev</button>
+    <span class="page-info">Page ${state.page}</span>
+    <button class="btn btn-primary" onclick="nextPage()" ${hasNext ? '' : 'disabled'}>Next →</button>
+  `
+}
+
+function renderDebug() {
+  const bar = document.getElementById('debug-bar')
+  const el = document.getElementById('debug-cursor')
+  if (state.currentCursor) {
+    bar.style.display = 'flex'
+    el.textContent = state.currentCursor
+  } else {
+    bar.style.display = 'none'
+  }
+}
+
+function nextPage() {
+  if (!state.nextCursor) return
+  state.cursorStack.push(state.currentCursor)  // save current so we can go back
+  state.currentCursor = state.nextCursor
+  state.page++
+  fetchProducts()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function prevPage() {
+  if (state.page <= 1) return
+  state.currentCursor = state.cursorStack.pop()
+  state.page--
+  fetchProducts()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function selectCategory(cat) {
+  state.category = cat
+  state.page = 1
+  state.currentCursor = null
+  state.nextCursor = null
+  state.cursorStack = []
+
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === cat)
+  })
+
+  const title = cat || 'All products'
+  document.getElementById('page-title').textContent = title
+
+  fetchProducts()
+}
+
+function changeLimit(val) {
+  state.limit = Number(val)
+  state.page = 1
+  state.currentCursor = null
+  state.nextCursor = null
+  state.cursorStack = []
+  fetchProducts()
+}
+
+// Init
+fetchProducts()
+</script>
+</body>
+</html>

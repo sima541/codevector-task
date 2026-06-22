@@ -4,6 +4,12 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const app = express()
+import { readFileSync } from 'fs'
+
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html')
+  res.send(readFileSync('./index.html'))
+})
 const PORT = process.env.PORT || 3000
 
 app.get('/products', async (req, res) => {
