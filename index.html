@@ -21,8 +21,6 @@
     --accent: #7c6df0;
     --accent2: #5a4dd4;
     --green: #22c55e;
-    --amber: #f59e0b;
-    --red: #ef4444;
     --mono: 'JetBrains Mono', monospace;
     --sans: 'Inter', sans-serif;
   }
@@ -39,22 +37,22 @@
   /* Header */
   header {
     border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    height: 56px;
+    padding: 0 16px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
     top: 0;
-    background: rgba(15,15,15,0.95);
+    background: rgba(15,15,15,0.97);
     backdrop-filter: blur(8px);
-    z-index: 100;
+    z-index: 200;
   }
 
   .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     font-weight: 600;
     font-size: 15px;
     letter-spacing: -0.3px;
@@ -69,102 +67,72 @@
 
   .header-meta {
     font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text3);
-  }
-
-  .header-meta span {
-    color: var(--green);
-  }
-
-  /* Layout */
-  .layout {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    min-height: calc(100vh - 56px);
-  }
-
-  /* Sidebar */
-  aside {
-    border-right: 1px solid var(--border);
-    padding: 20px 16px;
-    position: sticky;
-    top: 56px;
-    height: calc(100vh - 56px);
-    overflow-y: auto;
-  }
-
-  .sidebar-label {
     font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
     color: var(--text3);
-    margin-bottom: 10px;
-    padding: 0 8px;
   }
 
-  .cat-btn {
+  .header-meta span { color: var(--green); }
+
+  /* Category scroll strip (mobile + desktop) */
+  .cat-strip {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
+    gap: 6px;
+    padding: 10px 16px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 52px;
+    z-index: 100;
+    scrollbar-width: none;
+  }
+
+  .cat-strip::-webkit-scrollbar { display: none; }
+
+  .cat-pill {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
     color: var(--text2);
-    font-family: var(--sans);
-    font-size: 13px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.15s;
-    margin-bottom: 2px;
-  }
-
-  .cat-btn:hover { background: var(--surface); color: var(--text); }
-
-  .cat-btn.active {
-    background: rgba(124,109,240,0.15);
-    color: var(--accent);
+    font-size: 12px;
     font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
   }
 
-  .cat-count {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
+  .cat-pill:hover { border-color: var(--accent); color: var(--text); }
+
+  .cat-pill.active {
+    background: rgba(124,109,240,0.2);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
-  .cat-btn.active .cat-count { color: var(--accent); opacity: 0.7; }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 16px 0;
-  }
-
-  /* Main */
-  main { padding: 24px; }
-
+  /* Toolbar */
   .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
-    gap: 12px;
+    padding: 14px 16px 10px;
+    gap: 8px;
   }
 
   .toolbar-left {
     display: flex;
     align-items: center;
     gap: 8px;
+    min-width: 0;
   }
 
   .page-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .badge {
@@ -175,6 +143,7 @@
     background: var(--surface2);
     color: var(--text2);
     border: 1px solid var(--border2);
+    white-space: nowrap;
   }
 
   .limit-select {
@@ -187,42 +156,53 @@
     border-radius: 6px;
     cursor: pointer;
     outline: none;
+    flex-shrink: 0;
   }
 
-  .limit-select:focus { border-color: var(--accent); }
+  /* Main */
+  main { padding: 0 16px 32px; }
 
-  /* Product grid */
+  /* Grid — 1 col mobile, 2 col tablet, 3-4 col desktop */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-    margin-bottom: 24px;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  @media (min-width: 480px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 768px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (min-width: 1100px) {
+    .grid { grid-template-columns: repeat(4, 1fr); }
   }
 
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 16px;
-    transition: border-color 0.15s, transform 0.15s;
+    padding: 14px;
+    transition: border-color 0.15s;
     animation: fadeIn 0.2s ease;
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(5px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  .card:hover {
-    border-color: var(--border2);
-    transform: translateY(-1px);
-  }
+  .card:active { border-color: var(--border2); }
 
   .card-top {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     gap: 8px;
   }
 
@@ -247,25 +227,19 @@
     font-weight: 500;
     padding: 2px 8px;
     border-radius: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .card-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 8px;
+    padding-top: 8px;
     border-top: 1px solid var(--border);
   }
 
-  .card-id {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--text3);
-  }
-
-  .card-date {
+  .card-id, .card-date {
     font-family: var(--mono);
     font-size: 9px;
     color: var(--text3);
@@ -286,11 +260,12 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+    padding: 4px 0 8px;
   }
 
   .btn {
-    padding: 8px 16px;
-    border-radius: 7px;
+    padding: 9px 18px;
+    border-radius: 8px;
     border: 1px solid var(--border2);
     background: var(--surface);
     color: var(--text);
@@ -299,21 +274,11 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .btn:hover:not(:disabled) {
-    background: var(--surface2);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
+  .btn:active:not(:disabled) { opacity: 0.7; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .btn-primary {
     background: var(--accent);
@@ -321,17 +286,11 @@
     color: #fff;
   }
 
-  .btn-primary:hover:not(:disabled) {
-    background: var(--accent2);
-    border-color: var(--accent2);
-    color: #fff;
-  }
-
   .page-info {
     font-family: var(--mono);
     font-size: 11px;
     color: var(--text3);
-    padding: 0 8px;
+    padding: 0 4px;
   }
 
   /* Loading */
@@ -355,7 +314,6 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Empty */
   .empty {
     text-align: center;
     padding: 80px 0;
@@ -363,37 +321,6 @@
   }
 
   .empty-title { font-size: 15px; margin-bottom: 6px; color: var(--text2); }
-
-  /* Cursor debug bar */
-  .debug-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-  }
-
-  .debug-label { color: var(--accent); font-weight: 500; }
-
-  .debug-cursor {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: var(--text2);
-  }
-
-  @media (max-width: 640px) {
-    .layout { grid-template-columns: 1fr; }
-    aside { display: none; }
-    .grid { grid-template-columns: 1fr; }
-  }
 </style>
 </head>
 <body>
@@ -403,49 +330,37 @@
     <div class="logo-dot"></div>
     Product Browser
   </div>
-  <div class="header-meta">200,000 products &nbsp;·&nbsp; <span>live</span></div>
+  <div class="header-meta">200k products &nbsp;·&nbsp; <span>live</span></div>
 </header>
 
-<div class="layout">
-  <aside>
-    <div class="sidebar-label">Categories</div>
-    <button class="cat-btn active" data-cat="" onclick="selectCategory('')">
-      All products
-      <span class="cat-count">200k</span>
-    </button>
-    <div class="divider"></div>
-    <button class="cat-btn" data-cat="Electronics" onclick="selectCategory('Electronics')">Electronics<span class="cat-count"></span></button>
-    <button class="cat-btn" data-cat="Clothing" onclick="selectCategory('Clothing')">Clothing<span class="cat-count"></span></button>
-    <button class="cat-btn" data-cat="Books" onclick="selectCategory('Books')">Books<span class="cat-count"></span></button>
-    <button class="cat-btn" data-cat="Home" onclick="selectCategory('Home')">Home<span class="cat-count"></span></button>
-    <button class="cat-btn" data-cat="Sports" onclick="selectCategory('Sports')">Sports<span class="cat-count"></span></button>
-    <button class="cat-btn" data-cat="Toys" onclick="selectCategory('Toys')">Toys<span class="cat-count"></span></button>
-    <button class="cat-btn" data-cat="Food" onclick="selectCategory('Food')">Food<span class="cat-count"></span></button>
-  </aside>
-
-  <main>
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <span class="page-title" id="page-title">All products</span>
-        <span class="badge" id="page-badge">page 1</span>
-      </div>
-      <select class="limit-select" id="limit-select" onchange="changeLimit(this.value)">
-        <option value="20">20 per page</option>
-        <option value="40">40 per page</option>
-        <option value="100">100 per page</option>
-      </select>
-    </div>
-
-    <div class="debug-bar" id="debug-bar" style="display:none">
-      <span class="debug-label">cursor</span>
-      <span class="debug-cursor" id="debug-cursor">—</span>
-    </div>
-
-    <div id="content"></div>
-
-    <div class="pagination" id="pagination"></div>
-  </main>
+<!-- Category strip — scrollable on mobile, wraps on desktop -->
+<div class="cat-strip" id="cat-strip">
+  <button class="cat-pill active" data-cat="" onclick="selectCategory('')">All</button>
+  <button class="cat-pill" data-cat="Electronics" onclick="selectCategory('Electronics')">Electronics</button>
+  <button class="cat-pill" data-cat="Clothing" onclick="selectCategory('Clothing')">Clothing</button>
+  <button class="cat-pill" data-cat="Books" onclick="selectCategory('Books')">Books</button>
+  <button class="cat-pill" data-cat="Home" onclick="selectCategory('Home')">Home</button>
+  <button class="cat-pill" data-cat="Sports" onclick="selectCategory('Sports')">Sports</button>
+  <button class="cat-pill" data-cat="Toys" onclick="selectCategory('Toys')">Toys</button>
+  <button class="cat-pill" data-cat="Food" onclick="selectCategory('Food')">Food</button>
 </div>
+
+<div class="toolbar">
+  <div class="toolbar-left">
+    <span class="page-title" id="page-title">All products</span>
+    <span class="badge" id="page-badge">page 1</span>
+  </div>
+  <select class="limit-select" id="limit-select" onchange="changeLimit(this.value)">
+    <option value="20">20 / page</option>
+    <option value="40">40 / page</option>
+    <option value="100">100 / page</option>
+  </select>
+</div>
+
+<main>
+  <div id="content"></div>
+  <div class="pagination" id="pagination"></div>
+</main>
 
 <script>
 const API = 'https://codevector-task-jtfe.onrender.com'
@@ -454,7 +369,7 @@ let state = {
   category: '',
   limit: 20,
   page: 1,
-  cursorStack: [],   // stack of cursors — cursorStack[i] = cursor to fetch page i+1
+  cursorStack: [],
   currentCursor: null,
   nextCursor: null,
   loading: false
@@ -476,7 +391,6 @@ async function fetchProducts() {
     state.nextCursor = data.next_cursor
     renderProducts(data.data)
     renderPagination()
-    renderDebug()
   } catch (e) {
     document.getElementById('content').innerHTML = `
       <div class="empty">
@@ -490,11 +404,13 @@ async function fetchProducts() {
 
 function renderLoading() {
   document.getElementById('content').innerHTML = `
-    <div class="loading"><div class="spinner"></div> Loading products…</div>`
+    <div class="loading"><div class="spinner"></div> Loading…</div>`
   document.getElementById('pagination').innerHTML = ''
 }
 
 function renderProducts(products) {
+  document.getElementById('page-badge').textContent = `page ${state.page}`
+
   if (!products.length) {
     document.getElementById('content').innerHTML = `
       <div class="empty">
@@ -523,13 +439,11 @@ function renderProducts(products) {
   }).join('')
 
   document.getElementById('content').innerHTML = `<div class="grid">${cards}</div>`
-  document.getElementById('page-badge').textContent = `page ${state.page}`
 }
 
 function renderPagination() {
   const hasPrev = state.page > 1
   const hasNext = !!state.nextCursor
-
   document.getElementById('pagination').innerHTML = `
     <button class="btn" onclick="prevPage()" ${hasPrev ? '' : 'disabled'}>← Prev</button>
     <span class="page-info">Page ${state.page}</span>
@@ -537,20 +451,9 @@ function renderPagination() {
   `
 }
 
-function renderDebug() {
-  const bar = document.getElementById('debug-bar')
-  const el = document.getElementById('debug-cursor')
-  if (state.currentCursor) {
-    bar.style.display = 'flex'
-    el.textContent = state.currentCursor
-  } else {
-    bar.style.display = 'none'
-  }
-}
-
 function nextPage() {
   if (!state.nextCursor) return
-  state.cursorStack.push(state.currentCursor)  // save current so we can go back
+  state.cursorStack.push(state.currentCursor)
   state.currentCursor = state.nextCursor
   state.page++
   fetchProducts()
@@ -572,13 +475,11 @@ function selectCategory(cat) {
   state.nextCursor = null
   state.cursorStack = []
 
-  document.querySelectorAll('.cat-btn').forEach(b => {
+  document.querySelectorAll('.cat-pill').forEach(b => {
     b.classList.toggle('active', b.dataset.cat === cat)
   })
 
-  const title = cat || 'All products'
-  document.getElementById('page-title').textContent = title
-
+  document.getElementById('page-title').textContent = cat || 'All products'
   fetchProducts()
 }
 
@@ -591,7 +492,6 @@ function changeLimit(val) {
   fetchProducts()
 }
 
-// Init
 fetchProducts()
 </script>
 </body>
